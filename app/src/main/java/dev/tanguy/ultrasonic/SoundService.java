@@ -8,8 +8,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.ContentObserver;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -20,6 +18,7 @@ import android.os.PowerManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
+import android.widget.RemoteViews;
 
 import java.io.IOException;
 
@@ -30,22 +29,22 @@ public class SoundService extends Service implements    AudioManager.OnAudioFocu
 
     private final static String TAG = "SoundService";
 
-    private Bitmap ICON_VOLUME_MIN;
-    private Bitmap ICON_VOLUME_MID;
-    private Bitmap ICON_VOLUME_MAX;
-
     private Notification notification;
     private MediaPlayer player;
     private final IBinder myBinder = new MyBinder();
     private VolumeObserver volumeObserver;
     private int volumeLevel = 0;
     private int frequency = Constants.FREQUENCY_8;
+    private PendingIntent playIntent;
+    private PendingIntent muteIntent;
+    private PendingIntent maxLoudIntent;
+    private PendingIntent activityIntent;
 
     @Override
     public void onCreate() {
         super.onCreate();
         restorePreferences();
-        initIcons();
+        setUpIntents();
         initPlayer();
         setUpVolumeObserver();
         updateVolumeLevel();
@@ -73,19 +72,6 @@ public class SoundService extends Service implements    AudioManager.OnAudioFocu
         editor.apply();
     }
 
-    private void initIcons() {
-        Log.d(TAG, "Use white icons = "+ Constants.USE_WHITE_ICON);
-        ICON_VOLUME_MIN = BitmapFactory.decodeResource(getResources(),
-                Constants.USE_WHITE_ICON ? R.drawable.ic_volume_off_white_48dp
-                        : R.drawable.ic_volume_off_black_48dp);
-        ICON_VOLUME_MID = BitmapFactory.decodeResource(getResources(),
-                Constants.USE_WHITE_ICON ? R.drawable.ic_volume_down_white_48dp
-                        : R.drawable.ic_volume_down_black_48dp);
-        ICON_VOLUME_MAX = BitmapFactory.decodeResource(getResources(),
-                Constants.USE_WHITE_ICON ? R.drawable.ic_volume_up_white_48dp
-                        : R.drawable.ic_volume_up_black_48dp);
-    }
-
     @Override
     public void onDestroy() {
         if (player != null) {
@@ -99,10 +85,11 @@ public class SoundService extends Service implements    AudioManager.OnAudioFocu
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent != null) {
             Log.i(TAG, "onStartCommand with Action " + intent.getAction());
-            if (Constants.ACTION_PLAY.equals(intent.getAction())) play();
-            else if (Constants.ACTION_STOP.equals(intent.getAction())) stop();
-            else if (Constants.ACTION_INCREASE_VOLUME.equals(intent.getAction())) adjustVolume(true);
-            else if (Constants.ACTION_DECREASE_VOLUME.equals(intent.getAction())) adjustVolume(false);
+            if (Constants.ACTION_PLAY_OR_PAUSE.equals(intent.getAction())) {
+                if (isPlaying()) stop(); else play();
+            }
+            else if (Constants.ACTION_MAX_LOUD.equals(intent.getAction())) adjustVolume(true);
+            else if (Constants.ACTION_MUTE.equals(intent.getAction())) adjustVolume(false);
         }
         // We want this service to continue running until it is explicitly stopped, so return sticky.
         return START_STICKY;
@@ -110,10 +97,8 @@ public class SoundService extends Service implements    AudioManager.OnAudioFocu
 
     private void adjustVolume(boolean up) {
         AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC,
-                up ? AudioManager.ADJUST_RAISE : AudioManager.ADJUST_LOWER, 0);
-        audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC,
-                up ? AudioManager.ADJUST_RAISE : AudioManager.ADJUST_LOWER, 0);
+        audioManager.setStreamVolume(AudioManager.STREAM_MUSIC,
+                up ? audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC) : 0, 0);
     }
 
     private void setUpVolumeObserver() {
@@ -123,49 +108,50 @@ public class SoundService extends Service implements    AudioManager.OnAudioFocu
                         volumeObserver);
     }
 
+    private void setUpIntents() {
+        playIntent = PendingIntent.getService(this, 0,
+                new Intent(Constants.ACTION_PLAY_OR_PAUSE, null, this, SoundService.class),
+                PendingIntent.FLAG_UPDATE_CURRENT);
+        muteIntent = PendingIntent.getService(this, 0,
+                new Intent(Constants.ACTION_MUTE, null, this, SoundService.class),
+                PendingIntent.FLAG_UPDATE_CURRENT);
+        maxLoudIntent = PendingIntent.getService(this, 0,
+                new Intent(Constants.ACTION_MAX_LOUD, null, this, SoundService.class),
+                PendingIntent.FLAG_UPDATE_CURRENT);
+        activityIntent = PendingIntent.getActivity(this, 0,
+                new Intent(this, MainActivity.class),
+                PendingIntent.FLAG_UPDATE_CURRENT);
+    }
+
+
     private void updateNotification() {
 
         Log.d(TAG, "update notification, volume level = "+volumeLevel);
-        Bitmap largeIcon = ICON_VOLUME_MID;
-        switch(volumeLevel){
-            case Constants.VOLUME_MAX:
-                Log.d(TAG, "case VOLUME MAX");
-                largeIcon = ICON_VOLUME_MAX;
-                break;
-            case Constants.VOLUME_MIN:
-                Log.d(TAG, "case VOLUME MIN");
-                largeIcon = ICON_VOLUME_MIN;
-                break;
-        }
-
-        PendingIntent playIntent = PendingIntent.getService(this, 0,
-                new Intent(!isPlaying() ? Constants.ACTION_PLAY : Constants.ACTION_STOP,
-                        null, this, SoundService.class),
-                PendingIntent.FLAG_UPDATE_CURRENT);
-        PendingIntent decreaseIntent = PendingIntent.getService(this, 0,
-                new Intent(Constants.ACTION_DECREASE_VOLUME, null, this, SoundService.class),
-                PendingIntent.FLAG_UPDATE_CURRENT);
-        PendingIntent increaseIntent = PendingIntent.getService(this, 0,
-                new Intent(Constants.ACTION_INCREASE_VOLUME, null, this, SoundService.class),
-                PendingIntent.FLAG_UPDATE_CURRENT);
-        PendingIntent activityIntent = PendingIntent.getActivity(this, 0,
-                new Intent(this, MainActivity.class),
-                PendingIntent.FLAG_UPDATE_CURRENT);
 
         notification = new NotificationCompat.Builder(this)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setPriority(NotificationCompat.PRIORITY_MAX)
-                .setShowWhen(false)
                 .setOngoing(true)
                 .setContentIntent(activityIntent)
-                .setContentTitle("UltraSonic")
-                .setContentText(getFrequencyAsString())
-                .addAction(!isPlaying() ? Constants.ICON_PLAY : Constants.ICON_PAUSE, "", playIntent)
-                .addAction(Constants.ICON_DEC, "", decreaseIntent)
-                .addAction(Constants.ICON_INC, "", increaseIntent)
-                .setStyle(new NotificationCompat.MediaStyle().setShowActionsInCompactView(0, 1, 2))
-                .setLargeIcon(largeIcon)
                 .setSmallIcon(Constants.ICON_SMALL, volumeLevel).build();
+
+        RemoteViews contentView = new RemoteViews(getPackageName(), R.layout.notification);
+        contentView.setTextViewText(R.id.notif_text_view, getFrequencyAsString());
+        int iconId = -1;
+        switch(volumeLevel){
+            case Constants.VOLUME_MIN: iconId = R.drawable.ic_volume_mute_white_24dp; break;
+            case Constants.VOLUME_MID: iconId = R.drawable.ic_volume_down_white_24dp; break;
+            case Constants.VOLUME_MAX: iconId = R.drawable.ic_volume_up_white_24dp; break;
+        }
+        contentView.setImageViewResource(R.id.ic_notification, iconId);
+        contentView.setImageViewResource(R.id.ic_play, isPlaying() ?
+                R.drawable.ic_pause_black_24dp : R.drawable.ic_play_arrow_black_24dp);
+        contentView.setOnClickPendingIntent(R.id.ic_play, playIntent);
+        contentView.setOnClickPendingIntent(R.id.ic_mute, muteIntent);
+        contentView.setOnClickPendingIntent(R.id.ic_max_loud, maxLoudIntent);
+
+        notification.contentView = contentView;
+
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(Constants.NOTIFICATION_ID, notification);

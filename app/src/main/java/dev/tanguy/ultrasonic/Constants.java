@@ -11,10 +11,10 @@ public class Constants {
     final static int FREQUENCY_20 = 20;
     final static int FREQUENCY_22 = 22;
     final static String INTENT_PLAYING = "SoundServiceIsPlaying";
-    public final static String ACTION_PLAY = "dev.tanguy.ultrasonic.PLAY";
+    public final static String ACTION_PLAY_OR_PAUSE = "dev.tanguy.ultrasonic.PLAY";
     public final static String ACTION_STOP = "dev.tanguy.ultrasonic.STOP";
-    public final static String ACTION_INCREASE_VOLUME = "dev.tanguy.ultrasonic.INCREASE";
-    public final static String ACTION_DECREASE_VOLUME = "dev.tanguy.ultrasonic.DECREASE";
+    public final static String ACTION_MAX_LOUD = "dev.tanguy.ultrasonic.INCREASE";
+    public final static String ACTION_MUTE = "dev.tanguy.ultrasonic.DECREASE";
     public final static String RES_PREFIX = "android.resource://dev.tanguy.ultrasonic/";
     public final static int NOTIFICATION_ID = 0;
     public final static boolean USE_WHITE_ICON =
