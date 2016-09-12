@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">UltraSonic</string>
+
+    <string name="FREQUENCY_8">8 kHz</string>
+    <string name="FREQUENCY_12">12 kHz</string>
+    <string name="FREQUENCY_16">16 kHz</string>
+    <string name="FREQUENCY_20">20 kHz</string>
+    <string name="FREQUENCY_22">22 kHz</string>
+</resources>
