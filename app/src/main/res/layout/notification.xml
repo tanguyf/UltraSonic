@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <ImageView
-        android:alpha="0.8"
+        android:alpha="@dimen/alpha_icon"
         android:padding="9dp"
         android:background="@drawable/circle_icon"
         android:layout_marginLeft="12dp"
@@ -13,20 +14,23 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/ic_notification"
-        android:src="@drawable/notif_large_icon_black" />
+        android:src="@drawable/notif_large_icon_white" />
 
     <TextView
+        tools:text="20 kHz"
+        android:textStyle="italic"
         android:layout_toRightOf="@id/ic_notification"
         android:layout_marginLeft="16dp"
         android:layout_centerVertical="true"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="@android:style/TextAppearance.Small.Inverse"
+        android:textAppearance="@android:style/TextAppearance.Inverse"
+        android:textColor="@color/colorSecondaryText"
         android:id="@+id/notif_text_view"
         android:gravity="start" />
 
     <ImageView
-        android:alpha="0.7"
+        android:tint="@color/colorSecondaryText"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
         android:paddingLeft="16dp"
@@ -36,7 +40,7 @@
         android:id="@+id/ic_max_loud"
         android:src="@drawable/ic_volume_up_black_24dp" />
     <ImageView
-        android:alpha="0.7"
+        android:tint="@color/colorSecondaryText"
         android:layout_toLeftOf="@id/ic_max_loud"
         android:layout_centerVertical="true"
         android:paddingLeft="16dp"
@@ -46,7 +50,7 @@
         android:id="@+id/ic_mute"
         android:src="@drawable/ic_volume_off_black_24dp" />
     <ImageView
-        android:alpha="0.7"
+        android:tint="@color/colorSecondaryText"
         android:layout_toLeftOf="@id/ic_mute"
         android:layout_centerVertical="true"
         android:paddingLeft="16dp"

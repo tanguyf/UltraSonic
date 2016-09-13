@@ -4,55 +4,88 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
+    android:padding="24dp"
+    android:paddingBottom="48dp"
     tools:context="dev.tanguy.ultrasonic.MainActivity">
 
-    <ToggleButton
-        android:id="@+id/bt_toggle_play"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        style="@style/toggleButton"
-        android:background="@drawable/ic_toggle_bg"
-        android:layout_gravity="center" />
-
-    <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-        <RadioButton android:id="@+id/freq_8"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/FREQUENCY_8"
-            android:onClick="onRadioButtonClicked"/>
-        <RadioButton android:id="@+id/freq_12"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/FREQUENCY_12"
-            android:onClick="onRadioButtonClicked"/>
-        <RadioButton android:id="@+id/freq_16"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/FREQUENCY_16"
-            android:onClick="onRadioButtonClicked"/>
-        <RadioButton android:id="@+id/freq_20"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/FREQUENCY_20"
-            android:onClick="onRadioButtonClicked"/>
-        <RadioButton android:id="@+id/freq_22"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/FREQUENCY_22"
-            android:onClick="onRadioButtonClicked"/>
-    </RadioGroup>
-
-    <!--SeekBar
+    <!-- play/pause button -->
+    <FrameLayout
+        android:layout_weight="2"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/seekBar"
-        android:layout_gravity="center_horizontal" /-->
+        android:layout_height="wrap_content">
+        <ToggleButton
+            android:id="@+id/bt_toggle_play"
+            android:layout_width="128dp"
+            android:layout_height="128dp"
+            android:alpha="@dimen/alpha_icon"
+            style="@style/toggleButton"
+            android:background="@drawable/ic_toggle_bg"
+            android:backgroundTint="@color/colorPrimary"
+            android:layout_gravity="center" />
+    </FrameLayout>
+
+    <!-- frequency display -->
+    <TextView
+        android:id="@+id/text_frequency"
+        tools:text="16 kHz"
+        style="@style/TextAppearance.AppCompat.Display1"
+        android:textStyle="bold|italic"
+        android:layout_gravity="center"
+        android:layout_weight="1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <!-- volume bar -->
+    <LinearLayout
+        android:layout_weight="1"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:layout_gravity="center_vertical"
+            android:alpha="@dimen/alpha_icon"
+            android:padding="9dp"
+            android:background="@drawable/circle_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/ic_volume"
+            android:src="@drawable/notif_large_icon_white" />
+
+        <SeekBar
+            android:layout_margin="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/seekBarVolume"
+            android:layout_gravity="center"/>
+
+    </LinearLayout>
+
+    <!-- frequency bar -->
+    <LinearLayout
+        android:layout_weight="1"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:layout_gravity="center_vertical"
+            android:alpha="@dimen/alpha_icon"
+            android:padding="9dp"
+            android:background="@drawable/circle_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/ic_frequency"
+            android:src="@drawable/ic_music_note_white_24dp" />
+
+        <SeekBar
+            android:layout_margin="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/seekBarFrequency"
+            android:layout_gravity="center"/>
+
+    </LinearLayout>
+
 
 </LinearLayout>

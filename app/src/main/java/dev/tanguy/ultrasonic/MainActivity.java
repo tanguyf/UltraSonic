@@ -12,12 +12,16 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
+import android.util.Log;
 import android.widget.CompoundButton;
-import android.widget.RadioButton;
+import android.widget.ImageView;
+import android.widget.SeekBar;
+import android.widget.TextView;
 import android.widget.ToggleButton;
 
 public class MainActivity extends AppCompatActivity {
+
+    private final static String TAG = "MainActivity";
 
     private ToggleButton togglePlay;
 
@@ -27,16 +31,25 @@ public class MainActivity extends AppCompatActivity {
     private ServiceConnection serviceConnection;
     private LocalBroadcastManager broadcastManager;
     private BroadcastReceiver broadcastReceiver;
+    private SeekBar volumeBar;
+    private ImageView volumeIcon;
+    private SeekBar frequencyBar;
+    private TextView frequencyText;
 
     private void setUpBroadcastManager() {
         broadcastManager = LocalBroadcastManager.getInstance(this);
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(Constants.INTENT_PLAYING);
+        intentFilter.addAction(Constants.INTENT_VOLUME_CHANGED);
         broadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                if(intent.getAction().equals(Constants.INTENT_PLAYING)) {
+                Log.d(TAG, "receiving intent... "+intent);
+                if(Constants.INTENT_PLAYING.equals(intent.getAction())) {
                     updateToggleState();
+                }
+                else if(Constants.INTENT_VOLUME_CHANGED.equals(intent.getAction())){
+                    updateVolumeBar();
                 }
             }
         };
@@ -47,10 +60,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        setUpButtons();
-        restorePreferences();
         setUpSoundManager();
         setUpBroadcastManager();
+        setUpButtons();
+        restorePreferences();
     }
 
     @Override
@@ -83,43 +96,7 @@ public class MainActivity extends AppCompatActivity {
     private void restorePreferences() {
         SharedPreferences settings = getSharedPreferences(Constants.PREFS_NAME, 0);
         int frequency = settings.getInt(Constants.PREF_FREQUENCY, Constants.FREQUENCY_8);
-        switch (frequency) {
-            case Constants.FREQUENCY_8:
-                ((RadioButton) findViewById(R.id.freq_8)).setChecked(true);
-                break;
-            case Constants.FREQUENCY_12:
-                ((RadioButton) findViewById(R.id.freq_12)).setChecked(true);
-                break;
-            case Constants.FREQUENCY_16:
-                ((RadioButton) findViewById(R.id.freq_16)).setChecked(true);
-                break;
-            case Constants.FREQUENCY_20:
-                ((RadioButton) findViewById(R.id.freq_20)).setChecked(true);
-                break;
-            case Constants.FREQUENCY_22:
-                ((RadioButton) findViewById(R.id.freq_22)).setChecked(true);
-                break;
-        }
-    }
-
-    public void onRadioButtonClicked(View view) {
-        // Is the button now checked?
-        boolean checked = ((RadioButton) view).isChecked();
-        if (checked && soundService != null && serviceBound) {
-            // Check which radio button was clicked
-            switch (view.getId()) {
-                case R.id.freq_8: soundService.updateFrequency(8);
-                        break;
-                case R.id.freq_12: soundService.updateFrequency(12);
-                        break;
-                case R.id.freq_16: soundService.updateFrequency(16);
-                    break;
-                case R.id.freq_20: soundService.updateFrequency(20);
-                    break;
-                case R.id.freq_22: soundService.updateFrequency(22);
-                    break;
-            }
-        }
+        frequencyBar.setProgress(frequency - Constants.FREQUENCY_MIN);
     }
 
     private boolean isPlaying() {
@@ -140,7 +117,9 @@ public class MainActivity extends AppCompatActivity {
                     soundService = binder.getService();
                     //@TODO give service some data
                     serviceBound = true;
+                    //initialize values
                     updateToggleState();
+                    updateFrequencyText();
                 }
 
                 @Override
@@ -183,5 +162,59 @@ public class MainActivity extends AppCompatActivity {
                 else stop();
             }
         });
+        volumeIcon = (ImageView) findViewById(R.id.ic_volume);
+        volumeBar = (SeekBar) findViewById(R.id.seekBarVolume);
+        final AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        volumeBar.setMax(audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC));
+        volumeBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, progress, 0);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {}
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {}
+        });
+        updateVolumeBar();
+
+        frequencyBar = (SeekBar) findViewById(R.id.seekBarFrequency);
+        frequencyBar.setMax(Constants.FREQUENCY_MAX - Constants.FREQUENCY_MIN);
+        frequencyBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if(soundService != null)
+                    soundService.updateFrequency(progress+Constants.FREQUENCY_MIN);
+                updateFrequencyText();
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {}
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {}
+        });
+
+        frequencyText = (TextView) findViewById(R.id.text_frequency);
+    }
+
+    private void updateFrequencyText(){
+        if(soundService != null)
+            frequencyText.setText(Constants.getFrequencyAsStringResource(soundService.getFrequency()));
+    }
+
+    private void updateVolumeBar(){
+        final AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        final int volume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+        volumeBar.setProgress(volume);
+        int level = Constants.VOLUME_MID;
+        if (volume == audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC))
+            level = Constants.VOLUME_MAX;
+        else if (volume == 0)
+            level = Constants.VOLUME_MIN;
+        volumeIcon.setImageLevel(level);
+        Log.d(TAG, "update volume bar, level = " + volume);
     }
 }

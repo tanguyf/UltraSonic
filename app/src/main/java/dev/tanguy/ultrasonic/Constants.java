@@ -10,9 +10,12 @@ public class Constants {
     final static int FREQUENCY_16 = 16;
     final static int FREQUENCY_20 = 20;
     final static int FREQUENCY_22 = 22;
+    final static int FREQUENCY_MIN = FREQUENCY_8;
+    final static int FREQUENCY_MAX = FREQUENCY_22;
+    final static int[] FREQUENCIES = new int[]{8, 12, 16, 20, 22};
     final static String INTENT_PLAYING = "SoundServiceIsPlaying";
+    final static String INTENT_VOLUME_CHANGED = "VolumeChanged";
     public final static String ACTION_PLAY_OR_PAUSE = "dev.tanguy.ultrasonic.PLAY";
-    public final static String ACTION_STOP = "dev.tanguy.ultrasonic.STOP";
     public final static String ACTION_MAX_LOUD = "dev.tanguy.ultrasonic.INCREASE";
     public final static String ACTION_MUTE = "dev.tanguy.ultrasonic.DECREASE";
     public final static String RES_PREFIX = "android.resource://dev.tanguy.ultrasonic/";
@@ -21,15 +24,24 @@ public class Constants {
             (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP);
     public final static int ICON_SMALL = USE_WHITE_ICON ? R.drawable.notif_small_icon_white
                                     : R.drawable.notif_small_icon_black;
-    public final static int ICON_INC = USE_WHITE_ICON ? R.drawable.ic_volume_up_black_24dp
-                                    : R.drawable.ic_volume_up_white_24dp;
-    public final static int ICON_DEC = USE_WHITE_ICON ? R.drawable.ic_volume_down_black_24dp
-                                    : R.drawable.ic_volume_down_white_24dp;
-    public final static int ICON_PAUSE = USE_WHITE_ICON ? R.drawable.ic_pause_black_24dp
-                                                                                                                                            : R.drawable.ic_pause_white_24dp;
-    public final static int ICON_PLAY = USE_WHITE_ICON ? R.drawable.ic_play_arrow_black_24dp
-                                                                                                                                                                                    : R.drawable.ic_play_arrow_white_24dp;
     public final static int VOLUME_MIN = 0;
     public final static int VOLUME_MID = 1;
     public final static int VOLUME_MAX = 2;
+
+    public static int getFrequencyAsStringResource(int frequency) {
+        switch(frequency){
+            case FREQUENCY_8:
+                return R.string.FREQUENCY_8;
+            case FREQUENCY_12:
+                return R.string.FREQUENCY_12;
+            case FREQUENCY_16:
+                return R.string.FREQUENCY_16;
+            case FREQUENCY_20:
+                return R.string.FREQUENCY_20;
+            case FREQUENCY_22:
+                return R.string.FREQUENCY_22;
+            default:
+                return R.string.FREQUENCY_8;
+        }
+    }
 }

@@ -34,7 +34,7 @@ public class SoundService extends Service implements    AudioManager.OnAudioFocu
     private final IBinder myBinder = new MyBinder();
     private VolumeObserver volumeObserver;
     private int volumeLevel = 0;
-    private int frequency = Constants.FREQUENCY_8;
+    private int frequency = -1;
     private PendingIntent playIntent;
     private PendingIntent muteIntent;
     private PendingIntent maxLoudIntent;
@@ -55,21 +55,39 @@ public class SoundService extends Service implements    AudioManager.OnAudioFocu
         frequency = settings.getInt(Constants.PREF_FREQUENCY, Constants.FREQUENCY_8);
     }
 
+    public int getFrequency(){
+        if(frequency == -1){
+            restorePreferences();
+        }
+        return frequency;
+    }
+
     public void updateFrequency(int freq) {
 
-        frequency = freq;
-
-        if(isPlaying()) {
-            stop();
-            play();
+        // new frequency is the first frequency greater or equal freq
+        int newFrequency;
+        int i = 0;
+        do{
+            newFrequency = Constants.FREQUENCIES[i];
+            i++;
         }
+        while(i < Constants.FREQUENCIES.length && freq > newFrequency);
 
-        updateNotification();
+        if(newFrequency != frequency) {
+            frequency = newFrequency;
 
-        SharedPreferences settings = getSharedPreferences(Constants.PREFS_NAME, 0);
-        SharedPreferences.Editor editor = settings.edit();
-        editor.putInt(Constants.PREF_FREQUENCY, freq);
-        editor.apply();
+            if (isPlaying()) {
+                stop();
+                play();
+            }
+
+            updateNotification();
+
+            SharedPreferences settings = getSharedPreferences(Constants.PREFS_NAME, 0);
+            SharedPreferences.Editor editor = settings.edit();
+            editor.putInt(Constants.PREF_FREQUENCY, freq);
+            editor.apply();
+        }
     }
 
     @Override
@@ -136,7 +154,7 @@ public class SoundService extends Service implements    AudioManager.OnAudioFocu
                 .setSmallIcon(Constants.ICON_SMALL, volumeLevel).build();
 
         RemoteViews contentView = new RemoteViews(getPackageName(), R.layout.notification);
-        contentView.setTextViewText(R.id.notif_text_view, getFrequencyAsString());
+        contentView.setTextViewText(R.id.notif_text_view, getString(Constants.getFrequencyAsStringResource(frequency)));
         int iconId = -1;
         switch(volumeLevel){
             case Constants.VOLUME_MIN: iconId = R.drawable.ic_volume_mute_white_24dp; break;
@@ -191,23 +209,6 @@ public class SoundService extends Service implements    AudioManager.OnAudioFocu
             } catch (IOException e) {
                 Log.e(TAG, "setDataSource failed", e);
             }
-        }
-    }
-
-    private String getFrequencyAsString() {
-        switch(frequency){
-            case Constants.FREQUENCY_8:
-                return getString(R.string.FREQUENCY_8);
-            case Constants.FREQUENCY_12:
-                return getString(R.string.FREQUENCY_12);
-            case Constants.FREQUENCY_16:
-                return getString(R.string.FREQUENCY_16);
-            case Constants.FREQUENCY_20:
-                return getString(R.string.FREQUENCY_20);
-            case Constants.FREQUENCY_22:
-                return getString(R.string.FREQUENCY_22);
-            default:
-                return getString(R.string.FREQUENCY_8);
         }
     }
 
@@ -337,6 +338,11 @@ public class SoundService extends Service implements    AudioManager.OnAudioFocu
         updateNotification();
     }
 
+    private void sendVolumeChangedIntent() {
+        Log.d(TAG, "send intent volume changed");
+        LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Constants.INTENT_VOLUME_CHANGED));
+    }
+
 
     public class VolumeObserver extends ContentObserver {
         Context context;
@@ -355,6 +361,7 @@ public class SoundService extends Service implements    AudioManager.OnAudioFocu
         public void onChange(boolean selfChange) {
             super.onChange(selfChange);
             updateVolumeLevel();
+            sendVolumeChangedIntent();
         }
     }
 
