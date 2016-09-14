@@ -17,7 +17,6 @@
             android:id="@+id/bt_toggle_play"
             android:layout_width="128dp"
             android:layout_height="128dp"
-            android:alpha="@dimen/alpha_icon"
             style="@style/toggleButton"
             android:background="@drawable/ic_toggle_bg"
             android:backgroundTint="@color/colorPrimary"
@@ -44,7 +43,6 @@
 
         <ImageView
             android:layout_gravity="center_vertical"
-            android:alpha="@dimen/alpha_icon"
             android:padding="9dp"
             android:background="@drawable/circle_icon"
             android:layout_width="wrap_content"
@@ -70,7 +68,6 @@
 
         <ImageView
             android:layout_gravity="center_vertical"
-            android:alpha="@dimen/alpha_icon"
             android:padding="9dp"
             android:background="@drawable/circle_icon"
             android:layout_width="wrap_content"

@@ -5,11 +5,10 @@
     android:layout_height="match_parent">
 
     <ImageView
-        android:alpha="@dimen/alpha_icon"
         android:padding="9dp"
         android:background="@drawable/circle_icon"
-        android:layout_marginLeft="12dp"
-        android:layout_alignParentLeft="true"
+        android:layout_marginStart="12dp"
+        android:layout_alignParentStart="true"
         android:layout_centerVertical="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -19,8 +18,8 @@
     <TextView
         tools:text="20 kHz"
         android:textStyle="italic"
-        android:layout_toRightOf="@id/ic_notification"
-        android:layout_marginLeft="16dp"
+        android:layout_toEndOf="@id/ic_notification"
+        android:layout_marginStart="@dimen/notification_action_icon_margin"
         android:layout_centerVertical="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -29,35 +28,35 @@
         android:id="@+id/notif_text_view"
         android:gravity="start" />
 
-    <ImageView
+    <ImageButton
         android:tint="@color/colorSecondaryText"
-        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
+        android:padding="@dimen/notification_action_icon_margin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/ic_max_loud"
-        android:src="@drawable/ic_volume_up_black_24dp" />
-    <ImageView
+        android:src="@drawable/ic_volume_up_black_24dp"
+        android:background="@drawable/ripple_effect" />
+    <ImageButton
         android:tint="@color/colorSecondaryText"
-        android:layout_toLeftOf="@id/ic_max_loud"
+        android:layout_toStartOf="@id/ic_max_loud"
         android:layout_centerVertical="true"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
+        android:padding="@dimen/notification_action_icon_margin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/ic_mute"
-        android:src="@drawable/ic_volume_off_black_24dp" />
-    <ImageView
+        android:src="@drawable/ic_volume_off_black_24dp"
+        android:background="@drawable/ripple_effect"/>
+    <ImageButton
         android:tint="@color/colorSecondaryText"
-        android:layout_toLeftOf="@id/ic_mute"
+        android:layout_toStartOf="@id/ic_mute"
         android:layout_centerVertical="true"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
+        android:padding="@dimen/notification_action_icon_margin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/ic_play"
-        android:src="@drawable/notif_play_or_pause_icon_black" />
+        android:src="@drawable/notif_play_or_pause_icon_black"
+        android:background="@drawable/ripple_effect"/>
 
 </RelativeLayout>
