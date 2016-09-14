@@ -10,7 +10,7 @@
 
     <!-- play/pause button -->
     <FrameLayout
-        android:layout_weight="2"
+        android:layout_weight="4"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <ToggleButton
@@ -30,9 +30,33 @@
         style="@style/TextAppearance.AppCompat.Display1"
         android:textStyle="bold|italic"
         android:layout_gravity="center"
-        android:layout_weight="1"
+        android:layout_weight="2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
+
+    <!-- frequency bar -->
+    <LinearLayout
+        android:layout_weight="1"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:layout_gravity="center"
+            android:padding="9dp"
+            android:background="@drawable/circle_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/ic_frequency"
+            android:src="@drawable/ic_radio_white_24dp" />
+
+        <SeekBar
+            android:layout_margin="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/seekBarFrequency"
+            android:layout_gravity="center"/>
+    </LinearLayout>
 
     <!-- volume bar -->
     <LinearLayout
@@ -42,7 +66,7 @@
         android:layout_height="wrap_content">
 
         <ImageView
-            android:layout_gravity="center_vertical"
+            android:layout_gravity="center"
             android:padding="9dp"
             android:background="@drawable/circle_icon"
             android:layout_width="wrap_content"
@@ -55,31 +79,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/seekBarVolume"
-            android:layout_gravity="center"/>
-
-    </LinearLayout>
-
-    <!-- frequency bar -->
-    <LinearLayout
-        android:layout_weight="1"
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <ImageView
-            android:layout_gravity="center_vertical"
-            android:padding="9dp"
-            android:background="@drawable/circle_icon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/ic_frequency"
-            android:src="@drawable/ic_music_note_white_24dp" />
-
-        <SeekBar
-            android:layout_margin="10dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/seekBarFrequency"
             android:layout_gravity="center"/>
 
     </LinearLayout>
