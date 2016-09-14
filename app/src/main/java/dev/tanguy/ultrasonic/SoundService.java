@@ -19,6 +19,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 import android.widget.RemoteViews;
+import android.widget.Toast;
 
 import java.io.IOException;
 
@@ -117,6 +118,8 @@ public class SoundService extends Service implements    AudioManager.OnAudioFocu
         AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         audioManager.setStreamVolume(AudioManager.STREAM_MUSIC,
                 up ? audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC) : 0, 0);
+
+        Toast.makeText(this, up ? "Volume set to max" : "Volume muted", Toast.LENGTH_SHORT).show();
     }
 
     private void setUpVolumeObserver() {
